@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Drawing Area</title>
+        <!-- You can add your style here rather than in an external style sheet. -->
+        <style>
+            canvas {
+                border: 5px solid #d3d3d3;
+                background-color: #f1f1f1;
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- DO NOT MODIFY THIS HTML -->
+        <canvas id="myCanvas" width="350" height="500"></canvas>
+        <input type="color" id="picker" />
+
+        <script>
+            var canvas = document.getElementById("myCanvas");
+            var ctx = canvas.getContext("2d");
+
+            // set the canvas width and height based on the first window width and height, not changing based on the page
+            ctx.canvas.width = 0.8 * window.innerWidth;
+            ctx.canvas.height = 0.8 * window.innerHeight;
+
+            var w = canvas.width;
+            var h = canvas.height;
+            ctx.fillStyle = "#FF0000"; //default color: red
+
+            // initial position variable
+            var currpos = { x: 0, y: 0 };
+            var state = "down";
+            document.addEventListener("keyup", keycolor);
+            document.addEventListener("keydown", flag);
+            // canvas.addEventListener("mousemove", draw(flag(event)));
+            canvas.addEventListener("mousemove", findxy);
+
+            // change the color of the arc based on the color picker
+            var pickcolor = document.querySelector("#picker");
+            pickcolor.addEventListener("change", function(e) {
+                ctx.fillStyle = pickcolor.value;
+            });
+
+            // change the arc color based on keyboard input, and clear the canvas based on the keyboard input
+            function keycolor(e) {
+                //b keycode 66
+                if (e.keyCode == 66) {
+                    ctx.fillStyle = "blue";
+                }
+                //r keycode 82
+                if (e.keyCode == 82) {
+                    ctx.fillStyle = "red";
+                }
+                //g keycode 71
+                if (e.keyCode == 71) {
+                    ctx.fillStyle = "green";
+                }
+                //y keycode 89
+                if (e.keyCode == 89) {
+                    ctx.fillStyle = "yellow";
+                }
+                //space keycode 32, clear the canvas
+                if (e.keyCode == 32) {
+                    ctx.clearRect(0, 0, w, h);
+                }
+            }
+
+            // create a flag based on arrow key input for deciding when to draw
+            function flag(e) {
+                //up arrow keycode 38
+                if (e.keyCode == 38) {
+                    state = "up";
+                }
+                //down arrow keycode 40
+                if (e.keyCode == 40) {
+                    state = "down";
+                }
+                return state;
+            }
+
+            function findxy(e) {
+                // find the actual location of the mouse
+                var rect = canvas.getBoundingClientRect();
+                currpos.x =
+                    ((e.clientX - rect.left) / (rect.right - rect.left)) * w;
+                currpos.y =
+                    ((e.clientY - rect.top) / (rect.bottom - rect.top)) * h;
+
+                // call the flag function to check condition
+                state = flag(this);
+
+                // only draw when the pen is "down"
+                if (state == "down") {
+                    //the function to draw the path
+                    ctx.beginPath();
+                    ctx.arc(currpos.x, currpos.y, 10, 0, 2 * Math.PI);
+                    ctx.fill(); //draw the circle without the border(border uses stroke())
+                    ctx.closePath();
+                }
+            }
+        </script>
+    </body>
+</html>
